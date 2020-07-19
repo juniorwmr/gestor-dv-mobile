@@ -1,21 +1,55 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import { FontAwesome5 } from "@expo/vector-icons";
 
-export default function App() {
+import Clients from "./screens/Clients";
+import Profile from "./screens/Profile";
+import History from "./screens/History";
+
+const AppStack = createStackNavigator();
+const Tab = createMaterialBottomTabNavigator();
+
+function clientsApp() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <AppStack.Navigator
+      headerMode="none"
+      screenOptions={{
+        cardStyle: {
+          backgroundColor: "#f0f0f5",
+        },
+      }}
+    >
+      <AppStack.Screen name="Cliente" component={Clients} />
+      <AppStack.Screen name="Profile" component={Profile} />
+    </AppStack.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen
+          name="Clientes"
+          component={clientsApp}
+          options={{
+            tabBarIcon: ({ color }) => (
+              <FontAwesome5 name="users" color={color} size={18} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Histórico"
+          component={History}
+          options={{
+            tabBarIcon: ({ color }) => (
+              <FontAwesome5 name="history" color={color} size={18} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
+  );
+}

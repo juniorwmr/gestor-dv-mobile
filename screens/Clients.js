@@ -21,6 +21,11 @@ import {
 } from "@expo/vector-icons";
 
 import { useNavigation } from "@react-navigation/native";
+import Dialog, {
+  DialogFooter,
+  DialogButton,
+  DialogContent,
+} from "react-native-popup-dialog";
 
 import api from "../services/api";
 
@@ -35,6 +40,8 @@ export default function Clients() {
   const [phone, setPhone] = useState("");
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState([]);
+  const [visible, setVisible] = useState(false);
+  const [client, setClient] = useState({});
 
   function notifyMessage(msg) {
     if (Platform.OS === "android") {
@@ -78,6 +85,18 @@ export default function Clients() {
     }
   };
 
+  const removeClient = async (id) => {
+    setRegistering(true);
+    const response = await api.delete(`/clients/${id}`);
+    setRegistering(false);
+    if (response.status == 200) {
+      notifyMessage("Deletado com sucesso!");
+      onRefresh();
+    } else {
+      notifyMessage("Houve um erro ao deletar, tente novamente!");
+    }
+  };
+
   function SearchFilterFunction(text) {
     const newData = clients.filter(function (item) {
       //applying filter for the inserted text in search bar
@@ -104,6 +123,40 @@ export default function Clients() {
           underlineColorAndroid="transparent"
           placeholder="Pesquisar cliente"
         />
+        <View style={styles.removerContainer}>
+          <Dialog
+            visible={visible}
+            footer={
+              <DialogFooter>
+                <DialogButton
+                  text="Cancelar"
+                  onPress={() => {
+                    setVisible(false);
+                  }}
+                />
+                <DialogButton
+                  text="Deletar"
+                  onPress={() => {
+                    removeClient(client._id);
+                    setVisible(false);
+                  }}
+                />
+              </DialogFooter>
+            }
+          >
+            <DialogContent>
+              <FontAwesome
+                style={{ alignSelf: "center" }}
+                name="trash"
+                size={70}
+              />
+              <Text style={{ fontSize: 15 }}>
+                Você deseja remover{" "}
+                <Text style={{ fontWeight: "bold" }}>{client.name}</Text>?
+              </Text>
+            </DialogContent>
+          </Dialog>
+        </View>
       </View>
       {loading ? (
         <View
@@ -120,6 +173,10 @@ export default function Clients() {
           renderItem={({ item, index }) => {
             return (
               <TouchableOpacity
+                onLongPress={() => {
+                  setVisible(true);
+                  setClient(item);
+                }}
                 onPress={() => {
                   navigation.navigate("Profile", {
                     id: item._id,
@@ -198,7 +255,7 @@ export default function Clients() {
                     placeholderColor="#c4c3cb"
                     keyboard={"numeric"}
                     keyboardType={"numeric"}
-                    maxLength={10}
+                    maxLength={11}
                     style={styles.TextInput}
                     onChangeText={(text) => setPhone(text)}
                   />

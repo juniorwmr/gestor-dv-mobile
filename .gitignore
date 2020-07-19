@@ -9,6 +9,7 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 yarn.lock
+*.env
 /web-build
 
 # macOS

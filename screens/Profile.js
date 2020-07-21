@@ -17,15 +17,23 @@ import {
 import { Feather as Icon, FontAwesome } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import Moment from "moment";
+import Dialog, {
+  DialogFooter,
+  DialogButton,
+  DialogContent,
+} from "react-native-popup-dialog";
 import api from "../services/api";
 
 export default function Profile() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
+  const [registering, setRegistering] = useState(false);
   const [type, setType] = useState(null);
   const route = useRoute();
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const [sale, setSale] = useState(null);
   const [sales, setSales] = useState([]);
   const [saldo, setSaldo] = useState(0);
   const [description, setDescription] = useState("");
@@ -86,6 +94,18 @@ export default function Profile() {
     setLoading(false);
   };
 
+  const removeSale = async (id) => {
+    setRegistering(true);
+    const response = await api.delete(`/sales/${id}`);
+    setRegistering(false);
+    if (response.status == 200) {
+      notifyMessage("Deletado com sucesso!");
+      onRefresh();
+    } else {
+      notifyMessage("Houve um erro ao deletar, tente novamente!");
+    }
+  };
+
   useEffect(() => {
     loadSales();
   }, []);
@@ -113,16 +133,51 @@ export default function Profile() {
             marginTop: 5,
             fontWeight: "bold",
             fontSize: 20,
-            color: "#545454",
+            color: saldo >= 0 ? "#3cb55c" : '#b53c3c',
           }}
         >
           R$ {saldo}
         </Text>
       </View>
+      <View style={styles.removerContainer}>
+          <Dialog
+            visible={visible}
+            footer={
+              <DialogFooter>
+                <DialogButton
+                  text="Cancelar"
+                  onPress={() => {
+                    setVisible(false);
+                  }}
+                />
+                <DialogButton
+                  style={{backgroundColor: '#ff6e6e'}}
+                  textStyle={{color: 'white'}}
+                  text="Deletar"
+                  onPress={() => {
+                    removeSale(sale._id);
+                    setVisible(false);
+                  }}
+                />
+              </DialogFooter>
+            }
+          >
+            <DialogContent>
+               <FontAwesome
+                style={{ alignSelf: "center" }}
+                name="trash"
+                size={70}
+              /> 
+              <Text style={{ fontSize: 15 }}>
+                Você deseja remover?
+              </Text>
+            </DialogContent>
+          </Dialog>
+        </View>
       <View style={styles.containerProfile}>
         <FontAwesome name="user-circle" size={100} color="black" />
         <Text style={styles.clientName}>{route.params.name}</Text>
-        {loading ? (
+        {loading || registering ? (
           <View
             style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
           >
@@ -137,7 +192,12 @@ export default function Profile() {
               return (
                 <>
                   {item.type == 1 ? (
-                    <View style={styles.salesNegative}>
+                    <TouchableOpacity 
+                    onLongPress={() => {
+                      setVisible(true);
+                      setSale(item);
+                    }}
+                    style={styles.salesNegative}>
                       <FontAwesome
                         style={styles.salesIcon}
                         name="minus-square"
@@ -151,9 +211,12 @@ export default function Profile() {
                       <Text style={styles.salesDate}>
                         {Moment(item.created_at).format("DD/MM/YYYY")}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   ) : (
-                    <View style={styles.salesPositive}>
+                    <TouchableOpacity onLongPress={() => {
+                      setVisible(true);
+                      setSale(item);
+                    }} style={styles.salesPositive}>
                       <FontAwesome
                         style={styles.salesIcon}
                         name="plus-square"
@@ -167,7 +230,7 @@ export default function Profile() {
                       <Text style={styles.salesDate}>
                         {Moment(item.created_at).format("DD/MM/YYYY")}
                       </Text>
-                    </View>
+                    </TouchableOpacity>
                   )}
                 </>
               );

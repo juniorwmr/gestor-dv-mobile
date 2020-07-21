@@ -5,22 +5,29 @@
     "version": "1.0.0",
     "privacy": "public",
     "orientation": "portrait",
-    "platforms": ["ios", "android"],
-    "icon": "./assets/icon.png",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "icon": "./assets/images/drawable/icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/drawable/screen.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "gestor.dv.ios"
     },
     "android": {
       "package": "gestor.dv"
-    }
+    },
+    "entryPoint": "node_modules/expo/AppEntry.js"
   }
 }

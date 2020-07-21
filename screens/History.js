@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import LottieView from  "lottie-react-native";
 import {
   StyleSheet,
   ActivityIndicator,
@@ -86,10 +86,12 @@ export default function History() {
         />
       </TouchableOpacity>
       {loading ? (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <ActivityIndicator size="large" color="#4079ff" />
+        <View style={{flex: 1, width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}}>
+        <LottieView
+        source={require("../assets/animations/loading.json")}
+        loop
+        autoPlay
+        /> 
         </View>
       ) : (
         <FlatList

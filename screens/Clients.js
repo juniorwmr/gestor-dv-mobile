@@ -1,5 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import call from "react-native-phone-call";
+import LottieView from  "lottie-react-native";
+import {
+  useFonts,
+  Roboto_100Thin,
+  Roboto_300Light,
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_700Bold,
+  Roboto_900Black,
+} from '@expo-google-fonts/roboto';
 import {
   StyleSheet,
   SafeAreaView,
@@ -30,6 +40,14 @@ import Dialog, {
 import api from "../services/api";
 
 export default function Clients() {
+  let [fontsLoaded] = useFonts({
+  Roboto_100Thin,
+  Roboto_300Light,
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_700Bold,
+  Roboto_900Black,
+  })
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [registering, setRegistering] = useState(false);
@@ -42,6 +60,7 @@ export default function Clients() {
   const [filter, setFilter] = useState([]);
   const [visible, setVisible] = useState(false);
   const [client, setClient] = useState({});
+  const [borderColor, setBorderColor] = useState('#cecece');
 
   function notifyMessage(msg) {
     if (Platform.OS === "android") {
@@ -111,15 +130,17 @@ export default function Clients() {
   return (
     <View
       style={
-        modalVisible ? { ...styles.container, opacity: 0.3 } : styles.container
+        modalVisible || visible ? { ...styles.container, opacity: 0.3 } : styles.container
       }
     >
       <View style={styles.searchContainer}>
         <FontAwesome name="search" size={30} />
         <TextInput
-          style={styles.searchText}
+          style={{...styles.searchText, borderColor}}
           onChangeText={(text) => SearchFilterFunction(text)}
           value={search}
+          onBlur={() => setBorderColor("#cecece")}
+          onFocus={() => setBorderColor("#009688")}
           underlineColorAndroid="transparent"
           placeholder="Pesquisar cliente"
         />
@@ -135,6 +156,8 @@ export default function Clients() {
                   }}
                 />
                 <DialogButton
+                  style={{backgroundColor: '#ff6e6e'}}
+                  textStyle={{color: 'white'}}
                   text="Deletar"
                   onPress={() => {
                     removeClient(client._id);
@@ -145,11 +168,11 @@ export default function Clients() {
             }
           >
             <DialogContent>
-              <FontAwesome
+               <FontAwesome
                 style={{ alignSelf: "center" }}
                 name="trash"
                 size={70}
-              />
+              /> 
               <Text style={{ fontSize: 15 }}>
                 Você deseja remover{" "}
                 <Text style={{ fontWeight: "bold" }}>{client.name}</Text>?
@@ -159,10 +182,12 @@ export default function Clients() {
         </View>
       </View>
       {loading ? (
-        <View
-          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-        >
-          <ActivityIndicator size="large" color="#4079ff" />
+        <View style={{flex: 1, width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}}>
+        <LottieView
+        source={require("../assets/animations/loading.json")}
+        loop
+        autoPlay
+        /> 
         </View>
       ) : (
         <FlatList
@@ -314,8 +339,10 @@ const styles = StyleSheet.create({
     fontSize: 17,
     borderWidth: 1,
     paddingLeft: 10,
-    borderColor: "#009688",
+    fontFamily: 'Roboto_300Light',
+    borderColor: "#cecece",
     backgroundColor: "#FFFFFF",
+    
   },
   containerClients: {
     flex: 1,
@@ -326,6 +353,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   clientName: {
+    fontFamily: 'Roboto_300Light',
     fontSize: 16,
     left: 0,
   },

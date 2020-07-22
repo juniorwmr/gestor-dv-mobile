@@ -5,22 +5,17 @@
     "version": "1.0.0",
     "privacy": "public",
     "orientation": "portrait",
-    "platforms": [
-      "ios",
-      "android"
-    ],
-    "icon": "./assets/images/drawable/icon.png",
+    "platforms": ["ios", "android"],
+    "icon": "./assets/bundle/logo.png",
     "splash": {
-      "image": "./assets/images/drawable/screen.png",
+      "image": "./assets/bundle/Gestor.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "gestor.dv.ios"

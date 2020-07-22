@@ -118,8 +118,10 @@ export default function History() {
                       {Moment(item.created_at).format("DD/MM/YYYY")}
                     </Text>
                   </View>
-                ) : (
-                  <View style={styles.salesPositive}>
+                ) : null}
+                {
+                  item.type === 2 ? (
+                    <View style={styles.salesPositive}>
                     <FontAwesome
                       style={styles.salesIcon}
                       name="plus-square"
@@ -134,7 +136,27 @@ export default function History() {
                       {Moment(item.created_at).format("DD/MM/YYYY")}
                     </Text>
                   </View>
-                )}
+                  ) : null
+                }
+                {
+                  item.type === 3 ? (
+                    <View style={{...styles.salesPositive, backgroundColor: '#cecece'}}>
+                    <FontAwesome
+                      style={styles.salesIcon}
+                      name="plus-square"
+                      size={25}
+                      color="black"
+                    />
+                    <Text style={styles.salesName}>{item.client_id.name}</Text>
+                    <Text style={styles.salesDescription}>
+                      {item.description}
+                    </Text>
+                    <Text style={styles.salesDate}>
+                      {Moment(item.created_at).format("DD/MM/YYYY")}
+                    </Text>
+                  </View>
+                  ) : null
+                }
               </>
             );
           }}

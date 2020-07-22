@@ -126,7 +126,17 @@ export default function Clients() {
     setFilter(newData);
     setSearch(text);
   }
-
+  if (!fontsLoaded) {
+    return (
+      <View style={{flex: 1, width: 100, height: 100, justifyContent: 'center', alignItems: 'center'}}>
+        <LottieView
+        source={require("../assets/animations/loading.json")}
+        loop
+        autoPlay
+        /> 
+        </View>
+    )
+  } else {
   return (
     <View
       style={
@@ -311,6 +321,7 @@ export default function Clients() {
       </Modal>
     </View>
   );
+}
 }
 
 const width = Dimensions.get("window").width;

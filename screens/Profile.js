@@ -28,7 +28,6 @@ export default function Profile() {
   const navigation = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [registering, setRegistering] = useState(false);
-  const [type, setType] = useState(null);
   const route = useRoute();
   const [loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
@@ -38,6 +37,28 @@ export default function Profile() {
   const [saldo, setSaldo] = useState(0);
   const [description, setDescription] = useState("");
   const [value, setValue] = useState(0);
+  const [salesInfo, setSalesInfo] = useState({
+    color: '',
+    title: '',
+    type: 0,
+  });
+  const info = {
+    avista: {
+      name: "Pagamento à vista",
+      type: 3,
+      color: "#cecece"
+    },
+    abate: {
+      name: "Abater venda",
+      type: 2,
+      color: "#25cc28"
+    },
+    venda: {
+      name: "Adicionar Venda",
+      type: 1,
+      color: "rgba(231,44,66,1)"
+    }
+  };
 
   function notifyMessage(msg) {
     if (Platform.OS === "android") {
@@ -52,7 +73,7 @@ export default function Profile() {
     const response = await api.post(`/sales/${route.params.id}`, {
       description,
       value,
-      type,
+      type: salesInfo.type,
     });
     setLoading(false);
     setModalVisible(false);
@@ -76,7 +97,7 @@ export default function Profile() {
     sale.map((item) => {
       if (item.type == 1) {
         negatives.push(item.value);
-      } else {
+      } else if (item.type == 2) {
         positives.push(item.value);
       }
     });
@@ -212,26 +233,51 @@ export default function Profile() {
                         {Moment(item.created_at).format("DD/MM/YYYY")}
                       </Text>
                     </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity onLongPress={() => {
-                      setVisible(true);
-                      setSale(item);
-                    }} style={styles.salesPositive}>
-                      <FontAwesome
-                        style={styles.salesIcon}
-                        name="plus-square"
-                        size={25}
-                        color="#69b347"
-                      />
-                      <Text style={styles.salesCash}>R$ {item.value}</Text>
-                      <Text style={styles.salesDescription}>
-                        {item.description}
-                      </Text>
-                      <Text style={styles.salesDate}>
-                        {Moment(item.created_at).format("DD/MM/YYYY")}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                  ) : null}
+                  {
+                    item.type == 2 ? (
+                      <TouchableOpacity onLongPress={() => {
+                        setVisible(true);
+                        setSale(item);
+                      }} style={styles.salesPositive}>
+                        <FontAwesome
+                          style={styles.salesIcon}
+                          name="plus-square"
+                          size={25}
+                          color="#69b347"
+                        />
+                        <Text style={styles.salesCash}>R$ {item.value}</Text>
+                        <Text style={styles.salesDescription}>
+                          {item.description}
+                        </Text>
+                        <Text style={styles.salesDate}>
+                          {Moment(item.created_at).format("DD/MM/YYYY")}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : null
+                  }
+                  {
+                    item.type == 3 ? (
+                      <TouchableOpacity onLongPress={() => {
+                        setVisible(true);
+                        setSale(item);
+                      }} style={{...styles.salesPositive, backgroundColor: '#cecece'}}>
+                        <FontAwesome
+                          style={styles.salesIcon}
+                          name="plus-square"
+                          size={25}
+                          color="black"
+                        />
+                        <Text style={styles.salesCash}>R$ {item.value}</Text>
+                        <Text style={styles.salesDescription}>
+                          {item.description}
+                        </Text>
+                        <Text style={styles.salesDate}>
+                          {Moment(item.created_at).format("DD/MM/YYYY")}
+                        </Text>
+                      </TouchableOpacity>
+                    ) : null
+                  }
                 </>
               );
             }}
@@ -242,22 +288,44 @@ export default function Profile() {
         )}
       </View>
       <ActionButton size={65} buttonColor="#3498db">
+      <ActionButton.Item
+          buttonColor={info.avista.color}
+          title="Adicionar venda à vista"
+          onPress={() => {
+            setSalesInfo({
+              title: info.avista.name,
+              color: info.avista.color,
+              type: 3
+            })
+            setModalVisible(true);
+          }}
+        >
+          <Icon name="user-plus" style={styles.actionButtonIcon} />
+        </ActionButton.Item>
         <ActionButton.Item
-          buttonColor="#25cc28"
+          buttonColor={info.abate.color}
           title="Abater venda"
           onPress={() => {
+            setSalesInfo({
+              title: info.abate.name,
+              color: info.abate.color,
+              type: 2
+            })
             setModalVisible(true);
-            setType(2);
           }}
         >
           <Icon name="user-minus" style={styles.actionButtonIcon} />
         </ActionButton.Item>
         <ActionButton.Item
-          buttonColor="rgba(231,44,66,1)"
+          buttonColor={info.venda.color}
           title="Adicionar venda"
           onPress={() => {
+            setSalesInfo({
+              title: info.venda.name,
+              color: info.venda.color,
+              type: 1
+            })
             setModalVisible(true);
-            setType(1);
           }}
         >
           <Icon name="user-plus" style={styles.actionButtonIcon} />
@@ -266,22 +334,15 @@ export default function Profile() {
       <Modal animationType="fade" transparent={true} visible={modalVisible}>
         <View style={styles.centeredView}>
           <View
-            style={
-              type == 1
-                ? {
+            style={{
                     ...styles.modalView,
-                    backgroundColor: "rgba(231, 44, 66, 1)",
-                  }
-                : {
-                    ...styles.modalView,
-                    backgroundColor: "#47b03c",
-                  }
-            }
+                    backgroundColor: salesInfo.color,
+                  }}
           >
             <View style={styles.SalesContainer}>
               <View style={styles.SalesFormView}>
                 <Text style={styles.logoText}>
-                  {type == 1 ? "Adicionar Venda" : "Abater Venda"}
+                  {salesInfo.title}
                 </Text>
                 <TextInput
                   placeholder="Descrição"
@@ -315,7 +376,11 @@ export default function Profile() {
               style={styles.closeButton}
               onPress={() => {
                 setModalVisible(!modalVisible);
-                setType(null);
+                setSalesInfo({
+                  color: "",
+                  title: "",
+                  type: 0
+                })
               }}
             >
               <FontAwesome name="close" size={35} />
